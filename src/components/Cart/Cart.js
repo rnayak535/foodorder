@@ -10,11 +10,11 @@ const Cart = (props) => {
   const hasItem = cartCtx.item.length > 0;
 
   const cartItemAddHandler = (item) => {
-
+    cartCtx.addItem({...item, amount: 1});
   }
 
   const cartItemRemoveHandler = (id) => {
-      
+      cartCtx.removeItem(id);
 }
 
   const cartItem = (
@@ -26,12 +26,12 @@ const Cart = (props) => {
             name={item.name}
             price={item.price}
             amount={item.amount}
-            onRemove={cartItemRemoveHandler.bind(null, item.id)}
+            onRemove={cartItemRemoveHandler.bind(null, item.id)} 
             onAdd={cartItemAddHandler.bind(null, item)}
           />
         );
       })}
-    </ul>
+    </ul>  //The bind() method returns a new function, when invoked, we can set the parameter also.
   );
   return (
     <Modal onCloseOfCart={props.onCloseOfCart}>

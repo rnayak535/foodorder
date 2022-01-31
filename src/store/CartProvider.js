@@ -10,23 +10,43 @@ const cartReducer = (state, action) => {
     case "ADD":
       const updatedAmount =
         state.totalAmount + action.item.price * action.item.amount;
-      const existingCartItemIndex = state.items.findIndex(      //findIndex function returns the index in first match
+      const existingCartItemIndex = state.items.findIndex(
+        //findIndex function returns the index in first match
         (item) => item.id === action.item.id
       );
       const existingCartItem = state.items[existingCartItemIndex];
       let updatedItems;
 
       if (existingCartItem) {
-            const updatedItem = {
-              ...existingCartItem,
-              amount: existingCartItem.amount + action.item.amount
-          }
-          updatedItems = [...state.items];
-          updatedItems[existingCartItemIndex] = updatedItem;
-      }else{
+        const updatedItem = {
+          ...existingCartItem,
+          amount: existingCartItem.amount + action.item.amount,
+        };
+        updatedItems = [...state.items];
+        updatedItems[existingCartItemIndex] = updatedItem;
+      } else {
         updatedItems = state.items.concat(action.item); //concat() returns a hole new array by adding item object into array.
       }
       return { items: updatedItems, totalAmount: updatedAmount };
+    case "REMOVE":
+      const removeItemIndex = state.items.findIndex(
+        (item) => item.id === action.id
+      );
+      const removeCartItemObj = state.items[removeItemIndex];
+      let updatedItemss;
+      if (removeCartItemObj.amount === 1) {
+        updatedItemss = state.items.filter((item) => item.id !== action.id);
+      } else {
+        const updatedItemObj = {
+          ...removeCartItemObj,
+          amount: removeCartItemObj.amount - 1,
+        };
+        updatedItemss = [...state.items];
+        updatedItemss[removeItemIndex] = updatedItemObj;
+      }
+      const updatedAmounts = state.totalAmount - (removeCartItemObj.price);
+      return { items: updatedItemss, totalAmount: updatedAmounts };
+
     default:
       return defaultCartState;
   }
