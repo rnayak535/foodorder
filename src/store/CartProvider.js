@@ -18,6 +18,11 @@ const cartReducer = (state, action) => {
       let updatedItems;
 
       if (existingCartItem) {
+        if(existingCartItem.amount === 5)
+        {
+            alert('Max 5 items allowed per dish.');
+            return { items: state.items, totalAmount: state.totalAmount };
+        }
         const updatedItem = {
           ...existingCartItem,
           amount: existingCartItem.amount + action.item.amount,
