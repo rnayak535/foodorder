@@ -1,37 +1,59 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import MealItem from "./MealItem/MealItem";
 import Card from "../UI/Card";
 import classes from "./AvailableMeals.module.css";
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
-
 const AvailableMeals = (props) => {
-  const mealsList = DUMMY_MEALS.map((meal) => {
+
+  const [meals, setMeals] = useState([]);
+  const [isloading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() =>{
+    const fetchMeals = async () => {
+      setError(null);
+      const response = await fetch('http://react-http-c1e91-default-rtdb.firebaseio.com/meals.json');
+      if(!response.ok){
+        throw new Error('Request Failed');
+      }
+      const responseData = await response.json();
+      const loadMeals = [];
+      for(const key in responseData){
+        loadMeals.push({
+          id: key,
+          name: responseData[key].name,
+          description: responseData[key].description,
+          price: responseData[key].price,
+        });
+      }
+      setMeals(loadMeals);
+      setIsLoading(false);
+    };
+
+    fetchMeals().catch(error => {
+      setError(error.message);
+      setIsLoading(false);
+    });
+    
+  }, []);
+  
+  if(isloading){
+    return (
+      <section className={classes.mealIsLoading}>
+          <p>Loading...</p>
+      </section>
+    );
+  }
+
+  if(error){
+    return (
+      <section className={classes.mealHasError}>
+         <p>{error}</p>
+      </section>
+    );
+  }
+  
+  const mealsList = meals.map((meal) => {
     return (
       <MealItem
         key={meal.id}
@@ -42,10 +64,11 @@ const AvailableMeals = (props) => {
       />
     );
   });
+
   return (
     <section className={classes.meals}>
         <Card>
-            <ul>{mealsList}</ul>
+           {mealsList}
         </Card>
     </section>
   );
